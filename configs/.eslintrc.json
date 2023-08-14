@@ -1,0 +1,206 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "airbnb",
+    "plugin:jest/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "next/core-web-vitals"
+  ],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "paths": ["src"]
+      }
+    }
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "react",
+    "import-helpers",
+    "jest",
+    "sort-destructure-keys",
+    "better-styled-components"
+  ],
+  "rules": {
+    "react/display-name": "off",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [".js", ".jsx"]
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", ["parent", "sibling"], "index", "type"],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "{@configs/**,@configs,@tests/**,@tests}",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "{@contexts/**,@context,@hooks/**,@hooks}",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "{@i18n/**,@i18n}",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "{@lib/**,@lib}",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "{@pages/**,@pages,@services/**,@services,@models/**,@models}",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "{@components/**,@components}",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "{@utils/**,@utils,@styles/**,@styles}",
+            "group": "internal",
+            "position": "after"
+          },
+          {
+            "pattern": "{@mocks/**,@mocks}",
+            "group": "internal",
+            "position": "after"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react+", "builtin"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ],
+    "sort-imports": [
+      "error",
+      {
+        "ignoreDeclarationSort": true,
+        "ignoreMemberSort": false,
+        "allowSeparatedGroups": true
+      }
+    ],
+    "sort-destructure-keys/sort-destructure-keys": "error",
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "styled-components",
+            "message": "Please import from styled-components/macro."
+          }
+        ],
+        "patterns": ["!styled-components/macro"]
+      }
+    ],
+    "react/jsx-props-no-spreading": "off",
+    "import/prefer-default-export": "off",
+    "import/named": "off",
+    "better-styled-components/sort-declarations-alphabetically": "error",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+      ],
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "ecmaFeatures": {
+          "tsx": true
+        },
+        "ecmaVersion": 2018,
+        "sourceType": "module",
+        "project": "./tsconfig.json"
+      },
+      "plugins": ["@typescript-eslint"],
+      "rules": {
+        "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-shadow": ["error"],
+        "@typescript-eslint/no-unused-expressions": "off",
+        "@typescript-eslint/no-unused-vars": ["error"],
+        "@typescript-eslint/no-use-before-define": ["error"],
+        "chai-friendly/no-unused-expressions": "off",
+        "no-restricted-imports": "off",
+        "no-shadow": "off",
+        "no-unused-expressions": "off",
+        "no-unused-vars": "off",
+        "no-use-before-define": "off",
+        "react/jsx-filename-extension": [
+          "warn",
+          {
+            "extensions": [".tsx", ".ts"]
+          }
+        ],
+        "react/require-default-props": "off",
+        "spaced-comment": [
+          "error",
+          "always",
+          {
+            "markers": ["/"]
+          }
+        ],
+        "import/extensions": [
+          "error",
+          "ignorePackages",
+          {
+            "tsx": "never",
+            "ts": "never"
+          }
+        ],
+        "react/function-component-definition": [
+          2,
+          {
+            "namedComponents": "arrow-function"
+          }
+        ]
+      },
+      "settings": {
+        "import/resolver": {
+          "node": {
+            "extensions": [".ts", ".tsx"],
+            "moduleDirectory": ["src/"]
+          }
+        }
+      }
+    }
+  ]
+}

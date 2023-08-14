@@ -1,0 +1,133 @@
+variables:
+  APPSEC_HIGH_LIMIT: '2'
+
+  ## Build and deploy settings
+  JOB_CONTAINER_IMAGE: example.dkr.ecr.us-east-1.amazonaws.com/developer-engineering/nodejs:16
+  REGISTRY_IMAGE_PATH: example/example-starter
+
+stages:
+  - Typecheck and Lint
+  - Test and Coverage
+  - build
+  - deploy
+  - new_version
+  - Release Sentry
+
+default:
+  image: $JOB_CONTAINER_IMAGE
+  tags:
+    - Shared
+
+audit:
+  script:
+    - yarn audit-ci --moderate --allowlist ansi-html nth-check set-value immer ansi-regex next xmldom loader-utils @xmldom/xmldom
+
+push-to-ecr-stg:
+  image: 412729474065.dkr.ecr.us-east-1.amazonaws.com/developer-engineering/docker:latest
+  stage: build
+  environment: staging
+  tags:
+    - Shared_Staging
+  before_script:
+    - apk add -U python3 python3-dev py-pip
+    - pip install awscli
+    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_PRODUCTION_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+    - echo "building staging..."
+  script:
+    - docker build
+      --no-cache
+      --force-rm
+      --build-arg EXAMPLE_GITLAB_PACKAGE_TOKEN=${CI_JOB_TOKEN}
+      --build-arg NEXUS_AUTH_TOKEN=${NEXUS_AUTH_TOKEN}
+      --build-arg AWS_ACCOUNT_ID=${AWS_PRODUCTION_ACCOUNT_ID}
+      --build-arg SENTRY_ORG=${SENTRY_ORG}
+      --build-arg SENTRY_PROJECT=${SENTRY_PROJECT}
+      --build-arg SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      --build-arg SENTRY_URL=${SENTRY_URL}
+      --build-arg SENTRY_LOG_LEVEL=${SENTRY_LOG_LEVEL}
+      --build-arg SENTRY_DSN=${SENTRY_DSN}
+      --build-arg ENV=${ENV}
+      --build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+      --build-arg NEXT_PUBLIC_ADOPT_ID=${NEXT_PUBLIC_ADOPT_ID}
+      --build-arg NEXT_PUBLIC_FACEBOOK_DOMAIN_ID=${NEXT_PUBLIC_FACEBOOK_DOMAIN_ID}
+      --build-arg NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
+      --build-arg NEXT_PUBLIC_APP_ENV=${ENV}
+      --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+      --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+      --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_ANALYTICS_ENABLED=${NEXT_PUBLIC_FIREBASE_ANALYTICS_ENABLED}
+      --build-arg NEXT_PUBLIC_FACEBOOK_PIXEL_ID=${NEXT_PUBLIC_FACEBOOK_PIXEL_ID}
+      --build-arg NEXT_PUBLIC_GOOGLE_TAG_ID=${NEXT_PUBLIC_GOOGLE_TAG_ID}
+      -t ${REGISTRY_STG_ADDR}/${REGISTRY_IMAGE_PATH}:stg-${CI_COMMIT_SHORT_SHA}
+      -t ${REGISTRY_STG_ADDR}/${REGISTRY_IMAGE_PATH}:stg
+      .
+    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_STAGING_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+    - docker push ${REGISTRY_STG_ADDR}/${REGISTRY_IMAGE_PATH}:stg-${CI_COMMIT_SHORT_SHA}
+    - docker rmi ${REGISTRY_STG_ADDR}/${REGISTRY_IMAGE_PATH}:stg-${CI_COMMIT_SHORT_SHA}
+  rules:
+    - if: $CI_COMMIT_BRANCH == "staging" && $REGISTRY_IMAGE_PATH && $REGISTRY_STG_ADDR
+
+push-to-ecr:
+  image: 412729474065.dkr.ecr.us-east-1.amazonaws.com/developer-engineering/docker:latest
+  stage: build
+  environment: production
+  tags:
+    - Shared
+  before_script:
+    - apk add -U python3 python3-dev py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region us-east-1)
+    - echo "building production..."
+  script:
+    - docker build
+      --no-cache
+      --force-rm
+      --build-arg EXAMPLE_GITLAB_PACKAGE_TOKEN=${CI_JOB_TOKEN}
+      --build-arg NEXUS_AUTH_TOKEN=${NEXUS_AUTH_TOKEN}
+      --build-arg AWS_ACCOUNT_ID=${AWS_ACCOUNT_ID}
+      --build-arg SENTRY_ORG=${SENTRY_ORG}
+      --build-arg SENTRY_PROJECT=${SENTRY_PROJECT}
+      --build-arg SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      --build-arg SENTRY_URL=${SENTRY_URL}
+      --build-arg SENTRY_LOG_LEVEL=${SENTRY_LOG_LEVEL}
+      --build-arg SENTRY_DSN=${SENTRY_DSN}
+      --build-arg ENV=${ENV}
+      --build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+      --build-arg NEXT_PUBLIC_ADOPT_ID=${NEXT_PUBLIC_ADOPT_ID}
+      --build-arg NEXT_PUBLIC_FACEBOOK_DOMAIN_ID=${NEXT_PUBLIC_FACEBOOK_DOMAIN_ID}
+      --build-arg NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
+      --build-arg NEXT_PUBLIC_APP_ENV=${ENV}
+      --build-arg NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+      --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+      --build-arg NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID}
+      --build-arg NEXT_PUBLIC_FIREBASE_ANALYTICS_ENABLED=${NEXT_PUBLIC_FIREBASE_ANALYTICS_ENABLED}
+      --build-arg NEXT_PUBLIC_FACEBOOK_PIXEL_ID=${NEXT_PUBLIC_FACEBOOK_PIXEL_ID}
+      --build-arg NEXT_PUBLIC_GOOGLE_TAG_ID=${NEXT_PUBLIC_GOOGLE_TAG_ID}
+      -t ${REGISTRY_ADDR}/${REGISTRY_IMAGE_PATH}:${CI_COMMIT_TAG}
+      .
+    - docker push ${REGISTRY_ADDR}/${REGISTRY_IMAGE_PATH}:${CI_COMMIT_TAG}
+    - docker rmi ${REGISTRY_ADDR}/${REGISTRY_IMAGE_PATH}:${CI_COMMIT_TAG}
+  rules:
+    - if: $CI_COMMIT_TAG && $REGISTRY_IMAGE_PATH && $REGISTRY_ADDR
+
+new_version:
+  image: $JOB_CONTAINER_IMAGE
+
+include:
+  - project: 'developer-experience/example-gitlab-templates'
+    file:
+      - '/templates/general.yml'
+      - '/templates/node/default.yml'
+      - '/templates/node/tests.yml'
+      - '/templates/node/new-version.yml'
+      - '/templates/shared/release-sentry.yml'
+      - '/templates/build.yml'
+      - '/templates/deploy.yml' 

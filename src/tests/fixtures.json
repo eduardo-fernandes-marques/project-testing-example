@@ -1,0 +1,115 @@
+{
+  "resources": {
+    "revenues": [
+      { "label": "Test", "value": "Test" },
+      { "label": "New Test", "value": "New Test" }
+    ],
+
+    "segments": [
+      { "label": "Test", "value": "Test" },
+      { "label": "New Test", "value": "New Test" }
+    ],
+
+    "plans": [
+      {
+        "label": "Starter",
+        "value": "starter",
+        "detail": "7 dias grátis",
+        "options": [
+          { "checked": true, "title": "Lorem ipsun" },
+          { "checked": false, "title": "Lorem ipsun" },
+          { "checked": false, "title": "Lorem ipsun" }
+        ]
+      },
+      {
+        "label": "Scale",
+        "value": "scale",
+        "detail": "Consultar",
+        "options": [
+          { "checked": true, "title": "Lorem ipsun" },
+          { "checked": true, "title": "Lorem ipsun" },
+          { "checked": false, "title": "Lorem ipsun" }
+        ]
+      },
+      {
+        "label": "Premium",
+        "value": "premium",
+        "detail": "Consultar",
+        "options": [
+          { "checked": true, "title": "Lorem ipsun" },
+          { "checked": true, "title": "Lorem ipsun" },
+          { "checked": true, "title": "Lorem ipsun" }
+        ]
+      }
+    ],
+
+    "platforms": [
+      {
+        "label": "nuvem shop",
+        "value": "nuvemShop"
+      },
+      {
+        "label": "dooca",
+        "value": "dooca"
+      },
+      {
+        "label": "loja integrada",
+        "value": "lojaIntegrada"
+      },
+      {
+        "label": "magento",
+        "value": "magento"
+      },
+      {
+        "label": "vtex",
+        "value": "vtex"
+      },
+      {
+        "label": "shopify",
+        "value": "shopify"
+      },
+      {
+        "label": "tray",
+        "value": "tray"
+      },
+      {
+        "label": "wix",
+        "value": "wix"
+      },
+      {
+        "label": "woo",
+        "value": "woo"
+      },
+      {
+        "label": "outra",
+        "value": "other"
+      }
+    ],
+
+    "templates": [
+      {
+        "name": "basictemplate",
+        "href": "https://basictemplate.example.dev",
+        "image": "/images/template-7.png",
+        "segment": "Fashion",
+        "badge": {
+          "content": "Mais popular",
+          "variation": "trend"
+        }
+      }
+    ]
+  },
+  "lead": {
+    "store": {
+      "name": "Teste"
+    },
+    "name": "Teste",
+    "email": "test@example.com",
+    "id": "Xm6dlO5J9E8X7xCyd7m6",
+    "phone": "(51) 98266-1635",
+    "acceptedPrivacyPolicy": true,
+    "utmMedium": "utmMedium",
+    "utmSource": "utmSource",
+    "utmCampaign": "utmCampaign"
+  }
+}
